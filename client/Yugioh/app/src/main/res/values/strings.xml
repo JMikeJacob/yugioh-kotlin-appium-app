@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">YGCards</string>
+    <string name="card_parameters"><b>ATK:</b> %d <b>DEF:</b> %d</string>
+    <string name="expand_button_content_description">See more or less information about a card.</string>
+    <string name="search_field">Search</string>
+    <string name="loading_failed">Failed to load</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading</string>
+</resources>
