@@ -56,7 +56,7 @@ fun CardsScreen(cardsList: List<CardModel>, loadMoreItems: () -> Unit, modifier:
     var imageShownUrl by remember { mutableStateOf("") }
     val showPhoto: ((card: CardModel) -> Unit) = {
         isPhotoShowing = true
-        imageShownUrl = it.imgUri
+        imageShownUrl = it.imgUri ?: ""
     }
 
     val hidePhoto: (() -> Unit) = {

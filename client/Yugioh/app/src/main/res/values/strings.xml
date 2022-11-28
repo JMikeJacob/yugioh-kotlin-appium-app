@@ -6,4 +6,12 @@
     <string name="loading_failed">Failed to load</string>
     <string name="retry">Retry</string>
     <string name="loading">Loading</string>
+    <string name="back">Back</string>
+    <string name="create_card">Create Card</string>
+    <string name="form_name">Name</string>
+    <string name="form_type">Type</string>
+    <string name="form_atk">ATK Points</string>
+    <string name="form_def">DEF Points</string>
+    <string name="form_level">Level</string>
+    <string name="form_description">Description</string>
 </resources>

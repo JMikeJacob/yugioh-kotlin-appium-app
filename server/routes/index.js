@@ -10,6 +10,6 @@ router.get('/cards', controller.getCards);
 router.get('/cards/:id', controller.getCard);
 router.get('/images/cards/:filename', controller.getCardImage);
 router.get('/images/cards_small/:filename', controller.getCardImageSmall);
-
+router.post('/cards', controller.postCard);
 
 module.exports = router;

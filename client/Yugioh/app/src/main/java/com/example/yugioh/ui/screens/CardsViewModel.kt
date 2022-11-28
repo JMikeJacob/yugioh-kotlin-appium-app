@@ -1,6 +1,8 @@
 package com.example.yugioh.ui.screens
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,14 +15,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.yugioh.CardsApplication
 import com.example.yugioh.data.CardsRepository
 import com.example.yugioh.model.CardModel
-import com.example.yugioh.model.PaginatedListModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class CardsViewModel(private val cardsRepository: CardsRepository): ViewModel() {
@@ -40,7 +42,7 @@ class CardsViewModel(private val cardsRepository: CardsRepository): ViewModel() 
     val textSearch: StateFlow<String> = _textSearch.asStateFlow()
 
     init {
-        getCards(1, null, 15)
+        _getCards(1, null, 15)
 
         viewModelScope.launch {
             textSearch.debounce(1000).collect {
@@ -48,12 +50,12 @@ class CardsViewModel(private val cardsRepository: CardsRepository): ViewModel() 
                 totalItems = 0
                 page = 1
                 search = it.trim()
-                getCards(page, search)
+                _getCards(page, search)
             }
         }
     }
 
-    fun getCards(page: Int, search: String? = null, itemsPerPage: Int? = null) {
+    fun _getCards(page: Int, search: String? = null, itemsPerPage: Int? = null) {
         viewModelScope.launch {
             cardsUiState = CardsUiState.Loading
 
@@ -79,11 +81,66 @@ class CardsViewModel(private val cardsRepository: CardsRepository): ViewModel() 
         }
     }
 
+    fun _postCard(
+        context: Context,
+        name: String,
+        type: String,
+        description: String,
+        atk: Int?,
+        def: Int?
+    ) {
+        viewModelScope.launch {
+            val cardModel = CardModel(
+                name = name,
+                type = type,
+                description = description,
+                atk = atk ?: null,
+                def = def ?: null
+            )
+
+            val call: Call<CardModel> = cardsRepository.postCard(cardModel)
+
+            call!!.enqueue(object: Callback<CardModel> {
+                override fun onResponse(call: Call<CardModel>, response: Response<CardModel>) {
+                    Toast.makeText(context, "${name} posted to card list!", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFailure(call: Call<CardModel>, t: Throwable) {
+                    Toast.makeText(context, "${name} creation failed!", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+    }
+
+    val postCard: (
+        context: Context,
+        name: String,
+        type: String,
+        description: String,
+        atk: Int?,
+        def: Int?
+    ) -> Unit = {
+            context: Context,
+            name: String,
+            type: String,
+            description: String,
+            atk: Int?,
+            def: Int? ->
+        _postCard(
+            context = context,
+            name = name,
+            type = type,
+            description = description,
+            atk = atk ?: null,
+            def = def ?: null
+        )
+    }
+
     val getMoreCards: () -> Unit = {
         Log.d("cardsvm", "size: ${this.items.size}")
         if (this.items.isEmpty() || this.items.size < this.totalItems) {
             this.page++
-            getCards(this.page, this.search)
+            _getCards(this.page, this.search)
         }
     }
 
